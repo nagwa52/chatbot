@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
+use TheSeer\Tokenizer\Exception;
 
 class UserInputController extends Controller
 {
@@ -34,18 +35,47 @@ class UserInputController extends Controller
         $email = $request->email;
 
         if ($user) {
-            $successEmail = Mail::to($email)->send(new Registration($email));
+
+            $emailRes = $this->sendEmail($email);
+            $selecuser=UserInput::where('email', $email);
+            $selecuser->update([
+                "sent"=>'true'
+            ]);
 
             return new JsonResponse(
                 [
-
-                    'email' => $successEmail,
-                    'success' => true,
-                    'message' => "User created successfully",
-                    'user' => new UserResource($user)
+                    'usersuccess' => true,
+                    'message' => "User created successfully and email was sent",
+                    'user' => $user,
+                    'emailRes' => $emailRes
                 ],
                 200
             );
+        } else {
+            return new JsonResponse(
+                [
+
+                    'usersuccess' => false,
+                    'message' => "User does not created ",
+                    'user' => new UserResource($user)
+                ],
+                400
+            );
         }
+    }
+
+    public function sendEmail($email)
+    {
+
+        Mail::to($email)->send(new Registration($email));
+
+            return new JsonResponse(
+                [
+                    // 'emailsuccess' => false,
+                    'message' => "No errors, all sent successfully"
+                    // 'error' => Mail::failures()
+                ]
+            );
+
     }
 }

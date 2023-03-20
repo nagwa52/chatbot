@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('lname');
             $table->string('email')->unique();
             $table->string('phone')->unique();
+            $table->string('sent')->nullable();
             $table->timestamps();
         });
     }
