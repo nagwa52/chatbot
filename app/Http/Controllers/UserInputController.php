@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
-use TheSeer\Tokenizer\Exception;
 
 class UserInputController extends Controller
 {
@@ -25,7 +24,6 @@ class UserInputController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors());
         }
-
         $user = UserInput::create([
             'fname' => $request->fname,
             'lname' => $request->lname,
@@ -33,14 +31,12 @@ class UserInputController extends Controller
             'phone' => $request->phone
         ]);
         $email = $request->email;
-
+        $fname=$request->fname;
+        $lname=$request->lname;
+        $phone=$request->phone;
         if ($user) {
-
-            $emailRes = $this->sendEmail($email);
-            $selecuser=UserInput::where('email', $email);
-            $selecuser->update([
-                "sent"=>'true'
-            ]);
+            //$selecuser = UserInput::findOrFail($user->id);
+            $emailRes = $this->sendEmail($email,$phone,$lname,$fname);
 
             return new JsonResponse(
                 [
@@ -64,18 +60,22 @@ class UserInputController extends Controller
         }
     }
 
-    public function sendEmail($email)
-    {
+    public function sendEmail($email,$phone,$lname,$fname)
+    {$selectedUser = UserInput::where('email', '=', $email)->firstOrFail();
+            Mail::to("chatbot416@gmail.com")->send(new Registration($email,$phone,$lname,$fname));
 
-        Mail::to($email)->send(new Registration($email));
+            $selectedUser->update([
+                "sent" => true
+            ]);
 
             return new JsonResponse(
                 [
-                    // 'emailsuccess' => false,
-                    'message' => "No errors, all sent successfully"
-                    // 'error' => Mail::failures()
+                    'emailsuccess' => true,
+                    'message' => "email send succsseflly",
                 ]
             );
 
+
     }
+
 }
