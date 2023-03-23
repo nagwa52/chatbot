@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class UserInput extends Model
 {
     use HasFactory;
-    protected $fillable = ['fname','lname','email','phone'];
+    protected $fillable = ['fname','lname','email','phone','sent'];
 }

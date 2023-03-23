@@ -14,13 +14,18 @@ class Registration extends Mailable
 {
     use Queueable, SerializesModels;
     public $email;
-
+    public $phone;
+    public $lname;
+    public $fname;
     /**
      * Create a new message instance.
      */
-    public function __construct($email)
+    public function __construct($email,$phone,$lname,$fname)
     {
         $this->email = $email;
+        $this->phone = $phone;
+        $this->lname = $lname;
+        $this->fname = $fname;
     }
 
     /**
@@ -30,7 +35,7 @@ class Registration extends Mailable
     {
         return new Envelope(
             subject: 'Registration',
-            from: new Address('botchat150@gmail.com', 'chatbot')
+            from: new Address($this->email, 'chatbot')
         );
     }
 
@@ -56,7 +61,7 @@ class Registration extends Mailable
     public function build()
     {
 
-        return $this->subject('Thank you for subscribing to our newsletter')
+        return $this->subject('New chatbot enquiry')
             ->markdown('emails.users');
     }
 }
